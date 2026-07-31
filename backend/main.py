@@ -29,3 +29,10 @@ from backend import ingest
 from backend import llm
 from backend import rag
 from backend.store import store
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+
+app = FastAPI(title="RAG Document Q&A", version="1.0.0")
+app.add_middleware(
+    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+)
