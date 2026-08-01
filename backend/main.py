@@ -36,3 +36,33 @@ app = FastAPI(title="RAG Document Q&A", version="1.0.0")
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
+
+
+@app.get("/api/health")
+def health() -> dict:
+    return {"status": "ok", "llm": llm.info()}
+
+
+@app.get("/api/status")
+def status() -> dict:
+    return {**store.stats(), "llm": llm.info()}
+
+
+@app.post("/api/ingest")
+async def ingest_files(files: List[UploadFile] = File(...)) -> dict:
+    if not files:
+        raise HTTPException(status_code=400, detail="No files uploaded.")
+    added = []
+    errors = []
+    for f in files:
+        data = await f.read()
+        try:
+            start_id = store.stats()["num_chunks"]
+            doc = ingest.build_document(f.filename, data, start_id=start_id)
+            store.add_chunks(doc.chunks)
+            added.append({"name": f.filename, "chunks": len(doc.chunks)})
+        except Exception as exc:  # noqa: BLE001
+            errors.append({"name": f.filename, "error": str(exc)})
+    if not added and errors:
+        raise HTTPException(status_code=400, detail=errors[0]["error"])
+    return {"added": added, "errors": errors, "status": store.stats()}
