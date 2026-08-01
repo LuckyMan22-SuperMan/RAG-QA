@@ -12,4 +12,4 @@ _STOP = {
     "was", "were", "be", "with", "as", "by", "at", "it", "this", "that", "what",
     "which", "who", "how", "why", "when", "where", "do", "does", "did", "can",
     "i", "you", "we", "they", "he", "she", "from", "about", "into",
-}
+} #these wrds are removed from the query to improve search results
