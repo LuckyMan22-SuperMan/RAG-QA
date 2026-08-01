@@ -20,3 +20,9 @@ SYSTEM_PROMPT = (
     "provided context passages. Cite sources inline like [1], [2] matching the "
     "passage numbers. If the answer is not in the context, say you don't know."
 )
+ 
+ 
+def is_available() -> bool:
+    """LLM is available if either an OpenAI-compatible key or a Gemini key is set."""
+    return bool(_API_KEY or _GEMINI_KEY)
+ 
