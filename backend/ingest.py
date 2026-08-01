@@ -48,3 +48,22 @@ def extract_text(filename: str, data: bytes) -> tuple[str, List[tuple[int, str]]
         return text, [(1, text)]
     raise ValueError(f"Unsupported file type: {filename}. Use PDF, DOCX, TXT or MD.")
 
+
+def _extract_pdf(data: bytes) -> tuple[str, List[tuple[int, str]]]:
+    from pypdf import PdfReader
+
+    reader = PdfReader(io.BytesIO(data))
+    pages: List[tuple[int, str]] = []
+    parts: List[str] = []
+    for i, page in enumerate(reader.pages, start=1):
+        txt = page.extract_text() or ""
+        pages.append((i, txt))
+        parts.append(txt)
+    return "\n".join(parts), pages
+
+
+def _extract_docx(data: bytes) -> str:
+    from docx import Document as Docx
+
+    doc = Docx(io.BytesIO(data))
+    return "\n".join(p.text for p in doc.paragraphs)
