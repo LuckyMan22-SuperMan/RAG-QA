@@ -66,3 +66,14 @@ async def ingest_files(files: List[UploadFile] = File(...)) -> dict:
     if not added and errors:
         raise HTTPException(status_code=400, detail=errors[0]["error"])
     return {"added": added, "errors": errors, "status": store.stats()}
+@app.post("/api/remove")
+def remove(name: str = Form(...)) -> dict:
+    if not store.remove_document(name):
+        raise HTTPException(status_code=404, detail=f"Document '{name}' not indexed.")
+    return {"removed": name, "status": store.stats()}
+
+
+@app.post("/api/reset")
+def reset() -> dict:
+    store.reset()
+    return {"status": store.stats()}
