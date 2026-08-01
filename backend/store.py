@@ -17,3 +17,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from backend.ingest import Chunk
+
+
+class VectorStore:
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._chunks: List[Chunk] = []
+        self._vectorizer: TfidfVectorizer | None = None
+        self._matrix = None  # sparse TF-IDF matrix aligned with self._chunks
+        self._docs: Dict[str, int] = {}  # doc name -> chunk count
+
+    # ------------------------------------------------------------------ #
+    def add_chunks(self, chunks: List[Chunk]) -> None:
+        """Add new chunks to the store and rebuild the TF-IDF matrix.
+        Yet to implement"""
+        
