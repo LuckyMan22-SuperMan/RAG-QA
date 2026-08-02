@@ -68,3 +68,14 @@ class VectorStore:
                     "text": c.text, "score": round(score, 4),
                 })
             return results
+
+    # ------------------------------------------------------------------ #
+    def remove_document(self, name: str) -> bool:
+        """Drop all chunks belonging to a document and refit. Returns True if found."""
+        with self._lock:
+            if name not in self._docs:
+                return False
+            self._chunks = [c for c in self._chunks if c.doc != name]
+            del self._docs[name]
+            self._refit()
+            return True
