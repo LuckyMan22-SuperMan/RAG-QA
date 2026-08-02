@@ -110,3 +110,17 @@ def chunk_text(text: str, chunk_size: int = 900, overlap: int = 150) -> List[str
         chunks.append(current)
     return chunks
 
+def build_document(filename: str, data: bytes, start_id: int,
+                   chunk_size: int = 900, overlap: int = 150) -> Document:
+    """Extract + chunk a document, assigning globally-unique chunk ids."""
+    full_text, pages = extract_text(filename, data)
+    doc = Document(name=filename, text=full_text)
+    cid = start_id
+    for page_no, page_text in pages:
+        for ch in chunk_text(page_text, chunk_size, overlap):
+            doc.chunks.append(Chunk(id=cid, doc=filename, text=ch,
+                                    page=page_no if filename.lower().endswith(".pdf") else None))
+            cid += 1
+    if not doc.chunks:
+        raise ValueError(f"No extractable text found in '{filename}'.")
+    return doc
