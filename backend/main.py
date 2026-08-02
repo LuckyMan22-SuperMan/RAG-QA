@@ -66,6 +66,17 @@ async def ingest_files(files: List[UploadFile] = File(...)) -> dict:
     if not added and errors:
         raise HTTPException(status_code=400, detail=errors[0]["error"])
     return {"added": added, "errors": errors, "status": store.stats()}
+
+
+@app.post("/api/ask")
+def ask(question: str = Form(...), top_k: int = Form(5),
+        mode: str = Form("auto")) -> dict:
+    try:
+        return rag.answer(question, top_k=top_k, mode=mode)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
 @app.post("/api/remove")
 def remove(name: str = Form(...)) -> dict:
     if not store.remove_document(name):
