@@ -79,3 +79,9 @@ class VectorStore:
             del self._docs[name]
             self._refit()
             return True
+
+    def reset(self) -> None:
+        with self._lock:
+            self._chunks.clear()
+            self._docs.clear()
+            self._vectorizer, self._matrix = None, None
