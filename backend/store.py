@@ -85,3 +85,15 @@ class VectorStore:
             self._chunks.clear()
             self._docs.clear()
             self._vectorizer, self._matrix = None, None
+
+    def stats(self) -> Dict:
+        with self._lock:
+            return {
+                "num_docs": len(self._docs),
+                "num_chunks": len(self._chunks),
+                "docs": [{"name": n, "chunks": c} for n, c in self._docs.items()],
+                "vocab_size": len(self._vectorizer.vocabulary_) if self._vectorizer else 0,
+            }
+
+
+store = VectorStore()
