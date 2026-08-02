@@ -1,3 +1,12 @@
+"""RAG orchestration: retrieve relevant chunks, then produce an answer.
+
+Two answer modes:
+  * "extractive" (default, offline): stitch together the best-matching
+    sentences from the top chunks and highlight query terms. No LLM needed.
+  * "generative" (optional): pass the retrieved context to an LLM to write a
+    fluent, cited answer. Requires OPENAI_API_KEY.
+"""
+
 from __future__ import annotations
 
 import re
@@ -13,3 +22,12 @@ _STOP = {
     "which", "who", "how", "why", "when", "where", "do", "does", "did", "can",
     "i", "you", "we", "they", "he", "she", "from", "about", "into",
 } #these wrds are removed from the query to improve search results
+
+
+def _keywords(question: str) -> List[str]:
+    return [w.lower() for w in _WORD.findall(question) if w.lower() not in _STOP and len(w) > 1]
+
+
+def _split_sentences(text: str) -> List[str]:
+    return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+
