@@ -50,3 +50,21 @@ class VectorStore:
         )
         self._matrix = self._vectorizer.fit_transform(c.text for c in self._chunks)
 
+    def search(self, query: str, top_k: int = 5) -> List[Dict]:
+        with self._lock:
+            if not self._chunks or self._vectorizer is None:
+                return []
+            q_vec = self._vectorizer.transform([query])
+            sims = cosine_similarity(q_vec, self._matrix)[0]
+            top_k = min(top_k, len(sims))
+            # Indices of the top_k highest similarities, sorted descending.
+            top_idx = sims.argsort()[::-1][:top_k]
+            results = []
+            for idx in top_idx:
+                score = float(sims[idx])
+                c = self._chunks[idx]
+                results.append({
+                    "chunk_id": c.id, "doc": c.doc, "page": c.page,
+                    "text": c.text, "score": round(score, 4),
+                })
+            return results
