@@ -39,3 +39,14 @@ class VectorStore:
                 print(f"[store] added {len(chunks)} chunks, total_chunks={len(self._chunks)}, docs={list(self._docs.keys())}")
             except Exception:
                 pass
+
+    def _refit(self) -> None:
+        if not self._chunks:
+            self._vectorizer, self._matrix = None, None
+            return
+        self._vectorizer = TfidfVectorizer(
+            lowercase=True, stop_words="english",
+            ngram_range=(1, 2), sublinear_tf=True, min_df=1,
+        )
+        self._matrix = self._vectorizer.fit_transform(c.text for c in self._chunks)
+
