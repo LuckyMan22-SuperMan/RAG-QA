@@ -29,6 +29,13 @@ class VectorStore:
 
     # ------------------------------------------------------------------ #
     def add_chunks(self, chunks: List[Chunk]) -> None:
-        """Add new chunks to the store and rebuild the TF-IDF matrix.
-        Yet to implement"""
-        
+        with self._lock:
+            self._chunks.extend(chunks)
+            for c in chunks:
+                self._docs[c.doc] = self._docs.get(c.doc, 0) + 1
+            self._refit()
+            # Debug: log that chunks were added and overall stats.
+            try:
+                print(f"[store] added {len(chunks)} chunks, total_chunks={len(self._chunks)}, docs={list(self._docs.keys())}")
+            except Exception:
+                pass
