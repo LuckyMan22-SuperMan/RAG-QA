@@ -67,3 +67,46 @@ def _extract_docx(data: bytes) -> str:
 
     doc = Docx(io.BytesIO(data))
     return "\n".join(p.text for p in doc.paragraphs)
+
+
+# --------------------------------------------------------------------------- #
+# Chunking
+# --------------------------------------------------------------------------- #
+_SENT_SPLIT = re.compile(r"(?<=[.!?])\s+")
+
+
+def _clean(text: str) -> str:
+    text = text.replace("\r", " ")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def chunk_text(text: str, chunk_size: int = 900, overlap: int = 150) -> List[str]:
+    """Sentence-aware sliding window producing ~chunk_size character chunks."""
+    text = _clean(text)
+    if not text:
+        return []
+    sentences = _SENT_SPLIT.split(text)
+    chunks: List[str] = []
+    current = ""
+    for sent in sentences:
+        if len(current) + len(sent) + 1 <= chunk_size:
+            current = f"{current} {sent}".strip()
+        else:
+            if current:
+                chunks.append(current)
+            # Start new chunk, carrying overlap from the tail of the previous.
+            if overlap and chunks:
+                tail = chunks[-1][-overlap:]
+                current = f"{tail} {sent}".strip()
+            else:
+                current = sent
+            # A single very long sentence: hard-split it.
+            while len(current) > chunk_size:
+                chunks.append(current[:chunk_size])
+                current = current[chunk_size - overlap:]
+    if current:
+        chunks.append(current)
+    return chunks
+
