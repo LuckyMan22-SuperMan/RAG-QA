@@ -8,4 +8,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
+<body>
+  <div class="bg-grid"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">📄</span>
+      <div>
+        <h1>RAG <span class="accent">Document Q&A</span></h1>
+        <p>Upload documents and get concise, sourced answers.</p>
+      </div>
+    </div>
+    <div id="llm-badge" class="pill">Checking…</div>
+  </header>
+
+  <main class="container">
+    <!-- LEFT: knowledge base -->
+    <aside class="panel kb">
+      <h2 class="panel-title">Knowledge Base</h2>
+
+      <div id="dropzone" class="dropzone">
+        <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt,.md" hidden />
+        <div class="dz-icon">⬆</div>
+        <p><strong>Drop files</strong> or click to upload</p>
+        <span class="dz-hint">PDF · DOCX · TXT · MD</span>
+      </div>
+      <p class="error" id="ingest-error"></p>
+
+      <div class="kb-stats">
+        <div class="stat"><div class="k">Documents</div><div class="v" id="stat-docs">0</div></div>
+        <div class="stat"><div class="k">Chunks</div><div class="v" id="stat-chunks">0</div></div>
+        <div class="stat"><div class="k">Vocab</div><div class="v" id="stat-vocab">0</div></div>
+      </div>
+
+      <h3 class="sub">Indexed Files</h3>
+      <ul id="doc-list" class="doc-list"><li class="muted">Nothing indexed yet.</li></ul>
+      <button class="btn ghost" id="reset-btn">Clear knowledge base</button>
+    </aside>
+</body>
 </html>
