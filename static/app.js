@@ -6,3 +6,8 @@ async function api(path, opts) {
   if (!res.ok) throw new Error(data.detail || `Request failed (${res.status})`);
   return data;
 }
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
