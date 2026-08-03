@@ -49,3 +49,15 @@ def _extractive_answer(question: str, contexts: List[Dict], max_sentences: int =
         # Fall back to the single most relevant chunk's opening.
         return contexts[0]["text"][:400] + "..." if contexts else ""
     scored.sort(key=lambda t: t[0], reverse=True)
+    chosen = []
+    seen = set()
+    for score, ci, sent in scored:
+        if sent in seen:
+            continue
+        seen.add(sent)
+        chosen.append((ci, sent))
+        if len(chosen) >= max_sentences:
+            break
+    # Present in chunk order for readability, with citation markers.
+    chosen.sort(key=lambda t: t[0])
+    return " ".join(f"{sent} [{ci + 1}]" for ci, sent in chosen)
