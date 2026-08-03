@@ -39,3 +39,26 @@ def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
         for i, c in enumerate(contexts)
     )
     user_msg = f"Context passages:\n{context_block}\n\nQuestion: {question}\n\nAnswer:"
+
+    # Debug: how many contexts and average length (do not print contents)
+    try:
+        ctx_count = len(contexts)
+        avg_len = sum(len(c.get("text", "")) for c in contexts) // max(1, ctx_count)
+    except Exception:
+        ctx_count = 0
+        avg_len = 0
+    # Also list which documents/pages are included (doc names only).
+    try:
+        docs = ", ".join(f"{c.get('doc')}" + (f":p{c.get('page')}" if c.get('page') else "") for c in contexts)
+    except Exception:
+        docs = ""
+    print(f"[llm] contexts={ctx_count} avg_len={avg_len} docs=[{docs}]", file=sys.stderr)
+ 
+    
+    use_provider = None
+    if _GEMINI_KEY:
+        use_provider = "gemini"
+    elif _API_KEY:
+        use_provider = "openai"
+ 
+    print(f"[llm] provider_flags: OPENAI={bool(_API_KEY)} GEMINI={bool(_GEMINI_KEY)} chosen={use_provider}", file=sys.stderr)
