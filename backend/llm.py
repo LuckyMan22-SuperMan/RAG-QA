@@ -106,3 +106,21 @@ def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
             ],
             "generationConfig": {"temperature": 0.1},
         }
+        try:
+            prompt_len = len(SYSTEM_PROMPT) + len(user_msg)
+        except Exception:
+            prompt_len = 0
+        print(f"[llm] gemini_prompt_len={prompt_len}", file=sys.stderr)
+        try:
+            resp = requests.post(url, json=body, timeout=timeout)
+            resp.raise_for_status()
+            j = resp.json()
+        except requests.HTTPError as exc:
+            try:
+                status = exc.response.status_code  # type: ignore[attr-defined]
+                err_body = exc.response.text[:1000] if exc.response is not None else ""
+            except Exception:
+                status = None
+                err_body = ""
+            print(f"[llm] Gemini request failed: status={status} body={err_body}", file=sys.stderr)
+            raise
