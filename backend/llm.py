@@ -97,3 +97,12 @@ def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
                 body = ""
             print(f"[llm] OpenAI request failed: status={status} body={body}", file=sys.stderr)
             raise
+ 
+    if use_provider == "gemini":
+        url = f"{_GEMINI_BASE}/models/{_GEMINI_MODEL}:generateContent?key={_GEMINI_KEY}"
+        body = {
+            "contents": [
+                {"role": "user", "parts": [{"text": SYSTEM_PROMPT + "\n\n" + user_msg}]}
+            ],
+            "generationConfig": {"temperature": 0.1},
+        }
