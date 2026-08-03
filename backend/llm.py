@@ -124,6 +124,14 @@ def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
                 err_body = ""
             print(f"[llm] Gemini request failed: status={status} body={err_body}", file=sys.stderr)
             raise
+ 
+        try:
+            return j["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except (KeyError, IndexError, TypeError):
+            print(f"[llm] Unexpected Gemini response shape: {j}", file=sys.stderr)
+            return str(j)
+ 
+ 
 def info() -> dict:
     provider = None
     model = None
