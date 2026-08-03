@@ -26,21 +26,16 @@ def is_available() -> bool:
     """LLM is available if either an OpenAI-compatible key or a Gemini key is set."""
     return bool(_API_KEY or _GEMINI_KEY)
  
-def info() -> dict:
-    # Determine provider/model shown to the UI.
-    provider = None
-    model = None
-    base = None
-    if _API_KEY and not _GEMINI_KEY:
-        provider = "openai"
-        model = _MODEL
-        base = _BASE_URL
-    elif _GEMINI_KEY and not _API_KEY:
-        provider = "gemini"
-        model = _GEMINI_MODEL
-        base = _GEMINI_BASE
-    elif _API_KEY and _GEMINI_KEY:
-        provider = "openai+gemini"
-        model = _MODEL
-        base = _BASE_URL
-    return {"available": is_available(), "provider": provider, "model": model, "base_url": base}
+ 
+def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
+    """Call the LLM to synthesize an answer from retrieved contexts."""
+    if not is_available():
+        raise RuntimeError("LLM is not configured. Set OPENAI_API_KEY or GEMINI_API_KEY to enable it.")
+ 
+    context_block = "\n\n".join(
+        f"[{i + 1}] (source: {c['doc']}"
+        + (f", p.{c['page']}" if c.get("page") else "")
+        + f")\n{c['text']}"
+        for i, c in enumerate(contexts)
+    )
+    user_msg = f"Context passages:\n{context_block}\n\nQuestion: {question}\n\nAnswer:"
