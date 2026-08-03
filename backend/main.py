@@ -88,3 +88,11 @@ def remove(name: str = Form(...)) -> dict:
 def reset() -> dict:
     store.reset()
     return {"status": store.stats()}
+
+
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+    @app.get("/")
+    def index() -> FileResponse:
+        return FileResponse(str(STATIC_DIR / "index.html"))
