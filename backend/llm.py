@@ -124,3 +124,20 @@ def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
                 err_body = ""
             print(f"[llm] Gemini request failed: status={status} body={err_body}", file=sys.stderr)
             raise
+def info() -> dict:
+    provider = None
+    model = None
+    base = None
+    if _API_KEY and not _GEMINI_KEY:
+        provider = "openai"
+        model = _MODEL
+        base = _BASE_URL
+    elif _GEMINI_KEY and not _API_KEY:
+        provider = "gemini"
+        model = _GEMINI_MODEL
+        base = _GEMINI_BASE
+    elif _API_KEY and _GEMINI_KEY:
+        provider = "openai+gemini"
+        model = _MODEL
+        base = _BASE_URL
+    return {"available": is_available(), "provider": provider, "model": model, "base_url": base}
