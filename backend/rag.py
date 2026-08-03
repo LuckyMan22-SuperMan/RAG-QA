@@ -31,3 +31,21 @@ def _keywords(question: str) -> List[str]:
 def _split_sentences(text: str) -> List[str]:
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
 
+
+def _extractive_answer(question: str, contexts: List[Dict], max_sentences: int = 3) -> str:
+    """Pick the sentences across top contexts that best cover the query terms."""
+    kws = set(_keywords(question))
+    scored: List[tuple[float, int, str]] = []
+    for ci, c in enumerate(contexts):
+        for sent in _split_sentences(c["text"]):
+            words = set(w.lower() for w in _WORD.findall(sent))
+            overlap = len(kws & words)
+            if overlap == 0:
+                continue
+            # Reward query coverage, lightly favour higher-ranked chunks.
+            score = overlap + c["score"] - 0.01 * ci
+            scored.append((score, ci, sent))
+    if not scored:
+        # Fall back to the single most relevant chunk's opening.
+        return contexts[0]["text"][:400] + "..." if contexts else ""
+    scored.sort(key=lambda t: t[0], reverse=True)
