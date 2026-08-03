@@ -62,3 +62,38 @@ def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
         use_provider = "openai"
  
     print(f"[llm] provider_flags: OPENAI={bool(_API_KEY)} GEMINI={bool(_GEMINI_KEY)} chosen={use_provider}", file=sys.stderr)
+ 
+    if use_provider == "openai":
+        # Debug: show prompt length (approx)
+        try:
+            prompt_len = len(SYSTEM_PROMPT) + len(user_msg)
+        except Exception:
+            prompt_len = 0
+        print(f"[llm] openai_prompt_len={prompt_len}", file=sys.stderr)
+        try:
+            resp = requests.post(
+                f"{_BASE_URL}/chat/completions",
+                headers={"Authorization": f"Bearer {_API_KEY}",
+                         "Content-Type": "application/json"},
+                json={
+                    "model": _MODEL,
+                    "messages": [
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_msg},
+                    ],
+                    "temperature": 0.1,
+                },
+                timeout=timeout,
+            )
+            resp.raise_for_status()
+            return resp.json()["choices"][0]["message"]["content"].strip()
+        except requests.HTTPError as exc:
+            # Log OpenAI error (do not print keys)
+            try:
+                status = exc.response.status_code  # type: ignore[attr-defined]
+                body = exc.response.text[:1000] if exc.response is not None else ""
+            except Exception:
+                status = None
+                body = ""
+            print(f"[llm] OpenAI request failed: status={status} body={body}", file=sys.stderr)
+            raise
