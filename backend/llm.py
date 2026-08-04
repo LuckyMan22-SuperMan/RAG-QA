@@ -125,6 +125,8 @@ def generate(question: str, contexts: List[dict], timeout: int = 30) -> str:
             print(f"[llm] Gemini request failed: status={status} body={err_body}", file=sys.stderr)
             raise
  
+        # Gemini generateContent response shape:
+        # {"candidates": [{"content": {"parts": [{"text": "..."}]}}]}
         try:
             return j["candidates"][0]["content"]["parts"][0]["text"].strip()
         except (KeyError, IndexError, TypeError):
