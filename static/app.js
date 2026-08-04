@@ -57,3 +57,5 @@ dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("d
 dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
 dz.addEventListener("drop", (e) => { e.preventDefault(); dz.classList.remove("drag"); if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files); });
 fileInput.addEventListener("change", () => { if (fileInput.files.length) uploadFiles(fileInput.files); });
+
+async function uploadFiles(files) {}
