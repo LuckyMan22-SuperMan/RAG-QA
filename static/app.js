@@ -21,3 +21,8 @@ function highlight(text, keywords) {
   }
   return out;
 }
+
+// citation markers [1] -> styled span
+function styleCitations(html) {
+  return html.replace(/\[(\d+)\]/g, '<span class="cite">[$1]</span>');
+}
