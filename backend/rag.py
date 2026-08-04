@@ -70,3 +70,15 @@ def answer(question: str, top_k: int = 5, mode: str = "auto") -> Dict:
         raise ValueError("Please enter a question.")
 
     contexts = store.search(question, top_k=top_k)
+    # Debug: log retrieval results for diagnosis (doc names, pages, scores).
+    try:
+        ctx_info = ", ".join(f"{c['doc']}:{c.get('page','')}@{c['score']}" for c in contexts)
+    except Exception:
+        ctx_info = ""
+    print(f"[rag] question='{question}' keywords={_keywords(question)} top_k={top_k} contexts_count={len(contexts)} contexts=[{ctx_info}]")
+    if not contexts:
+        return {
+            "answer": "No documents indexed yet, or nothing relevant was found. "
+                      "Upload documents and try again.",
+            "mode": "none", "sources": [], "keywords": _keywords(question),
+        }
