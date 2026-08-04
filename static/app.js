@@ -58,4 +58,22 @@ dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
 dz.addEventListener("drop", (e) => { e.preventDefault(); dz.classList.remove("drag"); if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files); });
 fileInput.addEventListener("change", () => { if (fileInput.files.length) uploadFiles(fileInput.files); });
 
-async function uploadFiles(files) {}
+async function uploadFiles(files) {
+  $("ingest-error").textContent = "";
+  const fd = new FormData();
+  for (const f of files) fd.append("files", f);
+  const prev = dz.innerHTML;
+  dz.innerHTML = `<div class="dz-icon"><span class="spinner"></span></div><p>Indexing ${files.length} file(s)…</p>`;
+  try {
+    const r = await api("/api/ingest", { method: "POST", body: fd });
+    await refreshStatus();
+    if (r.errors && r.errors.length) {
+      $("ingest-error").textContent = r.errors.map((e) => `${e.name}: ${e.error}`).join("; ");
+    }
+  } catch (e) {
+    $("ingest-error").textContent = e.message;
+  } finally {
+    dz.innerHTML = prev;
+    fileInput.value = "";
+  }
+}
