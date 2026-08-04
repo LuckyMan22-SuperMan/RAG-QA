@@ -45,5 +45,33 @@
       <ul id="doc-list" class="doc-list"><li class="muted">Nothing indexed yet.</li></ul>
       <button class="btn ghost" id="reset-btn">Clear knowledge base</button>
     </aside>
+
+    <!-- RIGHT: chat -->
+    <section class="panel chat">
+      <h2 class="panel-title">Ask a Question</h2>
+
+      <div class="ask-row">
+        <input id="question" placeholder="e.g. What is the refund policy?" />
+        <button class="btn primary" id="ask-btn">Ask</button>
+      </div>
+      <div class="ask-opts">
+        <label>Mode
+          <select id="mode">
+            <option value="auto" selected>Auto</option>
+            <option value="extractive">Extractive (offline)</option>
+            <option value="generative">Generative (LLM)</option>
+          </select>
+        </label>
+        <label>Top-K
+          <input id="topk" type="number" min="1" max="10" value="5" />
+        </label>
+      </div>
+      <p class="error" id="ask-error"></p>
+
+      
+      </div>
+    </section>
+  </main>
+
 </body>
 </html>
