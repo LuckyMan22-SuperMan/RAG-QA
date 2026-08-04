@@ -48,3 +48,12 @@ async function refreshStatus() {
   if (s.llm.available) { badge.className = "pill on"; badge.textContent = `LLM: ${s.llm.model}`; }
   else { badge.className = "pill off"; badge.textContent = "LLM: off (extractive)"; }
 }
+
+// ------------------------------------------------------------ ingest
+const dz = $("dropzone");
+const fileInput = $("file-input");
+dz.addEventListener("click", () => fileInput.click());
+dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("drag"); });
+dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
+dz.addEventListener("drop", (e) => { e.preventDefault(); dz.classList.remove("drag"); if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files); });
+fileInput.addEventListener("change", () => { if (fileInput.files.length) uploadFiles(fileInput.files); });
