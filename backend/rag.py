@@ -82,3 +82,30 @@ def answer(question: str, top_k: int = 5, mode: str = "auto") -> Dict:
                       "Upload documents and try again.",
             "mode": "none", "sources": [], "keywords": _keywords(question),
         }
+
+    use_llm = mode == "generative" or (mode == "auto" and llm.is_available())
+    used_mode = "extractive"
+    llm_error = None
+    if use_llm:
+        try:
+            ans = llm.generate(question, contexts)
+            used_mode = "generative"
+        except Exception as exc:  # noqa: BLE001 - fall back gracefully
+            llm_error = str(exc)
+            ans = _extractive_answer(question, contexts)
+    else:
+        ans = _extractive_answer(question, contexts)
+
+    return {
+        "answer": ans,
+        "mode": used_mode,
+        "llm_error": llm_error,
+        "keywords": _keywords(question),
+        "sources": [
+            {
+                "n": i + 1, "doc": c["doc"], "page": c["page"],
+                "score": c["score"], "text": c["text"],
+            }
+            for i, c in enumerate(contexts)
+        ],
+    }
