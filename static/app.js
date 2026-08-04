@@ -35,3 +35,16 @@ async function refreshStatus() {
   $("stat-vocab").textContent = s.vocab_size;
   const list = $("doc-list");
   list.innerHTML = s.docs.length
+    ? s.docs.map((d) => `<li>
+        <span class="dname" title="${escapeHtml(d.name)}">${escapeHtml(d.name)}</span>
+        <span class="badge">${d.chunks} chunks</span>
+        <button class="doc-remove" data-name="${escapeHtml(d.name)}" title="Remove this file">&times;</button>
+      </li>`).join("")
+    : `<li class="muted">Nothing indexed yet.</li>`;
+  list.querySelectorAll(".doc-remove").forEach((btn) =>
+    btn.addEventListener("click", () => removeDoc(btn.dataset.name)));
+
+  const badge = $("llm-badge");
+  if (s.llm.available) { badge.className = "pill on"; badge.textContent = `LLM: ${s.llm.model}`; }
+  else { badge.className = "pill off"; badge.textContent = "LLM: off (extractive)"; }
+}
