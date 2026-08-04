@@ -26,3 +26,12 @@ function highlight(text, keywords) {
 function styleCitations(html) {
   return html.replace(/\[(\d+)\]/g, '<span class="cite">[$1]</span>');
 }
+
+// ------------------------------------------------------------ status / LLM
+async function refreshStatus() {
+  const s = await api("/api/status");
+  $("stat-docs").textContent = s.num_docs;
+  $("stat-chunks").textContent = s.num_chunks;
+  $("stat-vocab").textContent = s.vocab_size;
+  const list = $("doc-list");
+  list.innerHTML = s.docs.length
