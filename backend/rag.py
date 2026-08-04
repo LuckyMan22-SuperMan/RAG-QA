@@ -61,3 +61,12 @@ def _extractive_answer(question: str, contexts: List[Dict], max_sentences: int =
     # Present in chunk order for readability, with citation markers.
     chosen.sort(key=lambda t: t[0])
     return " ".join(f"{sent} [{ci + 1}]" for ci, sent in chosen)
+
+
+def answer(question: str, top_k: int = 5, mode: str = "auto") -> Dict:
+    """Retrieve context and answer the question."""
+    question = (question or "").strip()
+    if not question:
+        raise ValueError("Please enter a question.")
+
+    contexts = store.search(question, top_k=top_k)
