@@ -90,3 +90,22 @@ async function removeDoc(name) {
     $("ingest-error").textContent = e.message;
   }
 }
+async function ask() {
+  const q = $("question").value.trim();
+  $("ask-error").textContent = "";
+  if (!q) { $("ask-error").textContent = "Enter a question."; return; }
+  const btn = $("ask-btn");
+  btn.disabled = true; btn.innerHTML = `<span class="spinner"></span>`;
+  try {
+    const fd = new FormData();
+    fd.append("question", q);
+    fd.append("top_k", $("topk").value);
+    fd.append("mode", $("mode").value);
+    const r = await api("/api/ask", { method: "POST", body: fd });
+    renderAnswer(r);
+  } catch (e) {
+    $("ask-error").textContent = e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "Ask";
+  }
+}
