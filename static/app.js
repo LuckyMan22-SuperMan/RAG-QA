@@ -121,3 +121,12 @@ async function ask() {
     btn.disabled = false; btn.textContent = "Ask";
   }
 }
+
+function renderAnswer(r) {
+  const kws = r.keywords || [];
+  const tag = r.mode === "generative"
+    ? `<span class="tag gen">Generated (LLM)</span>`
+    : r.mode === "extractive"
+      ? `<span class="tag ext">Extractive</span>`
+      : `<span class="tag ext">No context</span>`;
+
