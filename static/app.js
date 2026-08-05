@@ -77,3 +77,16 @@ async function uploadFiles(files) {
     fileInput.value = "";
   }
 }
+
+// ------------------------------------------------------------ remove single doc
+async function removeDoc(name) {
+  $("ingest-error").textContent = "";
+  try {
+    const fd = new FormData();
+    fd.append("name", name);
+    await api("/api/remove", { method: "POST", body: fd });
+    await refreshStatus();
+  } catch (e) {
+    $("ingest-error").textContent = e.message;
+  }
+}
