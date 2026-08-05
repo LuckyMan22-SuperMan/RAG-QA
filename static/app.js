@@ -90,6 +90,18 @@ async function removeDoc(name) {
     $("ingest-error").textContent = e.message;
   }
 }
+
+// ------------------------------------------------------------ reset
+$("reset-btn").addEventListener("click", async () => {
+  await api("/api/reset", { method: "POST" });
+  await refreshStatus();
+  $("answer-area").innerHTML = `<div class="placeholder"><div class="ph-icon">💬</div><p>Knowledge base cleared. Upload documents to start again.</p></div>`;
+});
+
+// ------------------------------------------------------------ ask
+$("ask-btn").addEventListener("click", ask);
+$("question").addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
+
 async function ask() {
   const q = $("question").value.trim();
   $("ask-error").textContent = "";
