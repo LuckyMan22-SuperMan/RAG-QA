@@ -130,3 +130,17 @@ function renderAnswer(r) {
       ? `<span class="tag ext">Extractive</span>`
       : `<span class="tag ext">No context</span>`;
 
+  const answerHtml = styleCitations(highlight(r.answer, kws));
+  const warn = r.llm_error
+    ? `<p class="warn-line">LLM unavailable (${escapeHtml(r.llm_error)}) — showed extractive answer instead.</p>`
+    : "";
+
+  const sources = (r.sources || []).map((s) => `
+    <details class="source">
+      <summary>
+        <span class="snum">${s.n}</span>
+        <span class="sdoc">${escapeHtml(s.doc)}${s.page ? " · p." + s.page : ""}</span>
+        <span class="sscore">score ${s.score}</span>
+      </summary>
+      <div class="sbody">${highlight(s.text, kws)}</div>
+    </details>`).join("");
