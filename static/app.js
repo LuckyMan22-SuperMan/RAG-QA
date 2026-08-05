@@ -144,3 +144,16 @@ function renderAnswer(r) {
       </summary>
       <div class="sbody">${highlight(s.text, kws)}</div>
     </details>`).join("");
+
+  $("answer-area").innerHTML = `
+    <div class="answer-card">
+      <div class="answer-head">${tag}</div>
+      <div class="answer-text">${answerHtml}</div>
+      ${warn}
+    </div>
+    ${sources ? `<div class="sources"><h3 class="sub">Sources (${r.sources.length})</h3>${sources}</div>` : ""}
+  `;
+}
+
+// ------------------------------------------------------------ init
+refreshStatus().catch((e) => { $("ingest-error").textContent = e.message; });
